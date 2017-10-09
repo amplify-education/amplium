@@ -1,0 +1,48 @@
+zookeeper:
+  host: '127.0.0.1' # IP of zookeeper instance
+  port: 2181 # Port of zookeeper instance
+  selenium_grid_zookeeper_path: '/nerve/services/selenium_grid/services' # Path to selenium grid hub services in zookeeper
+
+logging:
+  version: 1
+  disable_existing_loggers: False
+  loggers:
+    '':
+      level: INFO
+      handlers:
+        - stdoutHandler
+    amplium:
+      level: INFO
+      handlers:
+        - ampliumStdoutHandler
+      propagate: False
+  handlers:
+    stdoutHandler:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: simpleFormatter
+      stream: 'ext://sys.stdout'
+    ampliumStdoutHandler:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: tracekeyFormatter
+      stream: 'ext://sys.stdout'
+      filters:
+        - tracekey
+  formatters:
+    simpleFormatter:
+      format: '[%(asctime)s] | %(name)s | %(levelname)s | %(message)s'
+    tracekeyFormatter:
+      format: '[%(asctime)s] | %(name)s | %(levelname)s| %(tracekey)s | %(message)s'
+  filters:
+    tracekey:
+      '()': 'amplium.utils.tracekey.TracekeyFilter'
+
+dynamodb:
+  table_name: 'amplium'
+  region: 'us-west-2'
+
+integrations:
+  saucelabs:
+    username: 'username'
+    accesskey:  'accesskey'

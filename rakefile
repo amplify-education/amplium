@@ -1,0 +1,65 @@
+#
+#   build script for $project
+#
+
+require 'rake/clean'
+
+
+RECOMMENDED_RUBY_VERSION = "1.9.2"
+TASKS_DIR = "tasks"
+
+
+
+class RubyVersion < Array
+  def initialize s
+    super(s.split('.').map { |e| e.to_i })
+  end
+  def < x
+    (self <=> x) < 0
+  end
+  def > x
+    (self <=> x) > 0
+  end
+  def == x
+    (self <=> x) == 0
+  end
+end
+
+def check_version
+  this_version = RubyVersion.new(RUBY_VERSION)
+  recommended_version = RubyVersion.new(RECOMMENDED_RUBY_VERSION)
+
+  if this_version == recommended_version
+    notice("Ruby looks good, using version #{RUBY_VERSION}")
+  elsif this_version < recommended_version
+    warn(["Ruby is below the recommended version",
+          "Ruby #{RECOMMENDED_RUBY_VERSION} is recommended, but this is #{RUBY_VERSION}.",
+          "Significant problems may arise!"])
+  else
+    warn(["Ruby is newer than the recommended version",
+            "Ruby #{RECOMMENDED_RUBY_VERSION} is recommended, but this is #{RUBY_VERSION}.",
+            "That should be okay, but it'd be better to run the exact recommended version."])
+  end
+end
+
+def load_tasks
+  # Load the project-templated constants
+  load("#{TASKS_DIR}/project.rb")
+  # And the logic for looking up constants
+  load("#{TASKS_DIR}/projectvar.rake")
+  # And then the template-dependent path constants
+  load("#{TASKS_DIR}/paths.rb")
+
+  #Load tasks defined in TASK_DIR
+  Dir.glob("#{TASKS_DIR}/*.rake").reject {
+      |t| ["helper.rake", "projectvar.rake"].include?(File.basename(t))
+  }.each {|t| load(t)}
+end
+
+# Load the helper methods first
+load("#{TASKS_DIR}/helper.rake")
+
+check_version
+load_tasks
+
+CLEAN.include(FileList['*.pyc'], ProjectPaths::EGG_BUILD_FILES)

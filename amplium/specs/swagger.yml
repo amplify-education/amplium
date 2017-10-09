@@ -1,0 +1,159 @@
+swagger: '2.0'
+info:
+  version: 0.0.1
+  title: Amplium API
+paths:
+  /status:
+    get:
+      operationId: amplium.api.internal.get_status
+      description: Returns the current status of Amplium with all of its grid nodes and data.
+      responses:
+        200:
+          description: OK
+          schema:
+              allOf:
+              - $ref: '#/definitions/ok_response'
+              - type: object
+                properties:
+                  nodes:
+                    description: The node's properties
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        available_capacity:
+                          description: The number of available nodes
+                          type: integer
+                        browsers:
+                          type: object
+                          description: Lists the browsers, versions, and the total amount
+                          properties:
+                            browser:
+                              type: string
+                            version:
+                              type: string
+                            total:
+                              type: integer
+                        host:
+                          description: the host number
+                          type: string
+                        name:
+                          description: the name of the node
+                          type: string
+                        port:
+                          description: the port number
+                          type: integer
+                        total_capacity:
+                          description: How many nodes that it can hold
+                          type: integer
+
+  /proxy/session:
+    post:
+      operationId: amplium.api.proxy.create_session
+      description: Creates a new session.
+      parameters:
+        - name: new_session
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ok_response'
+
+  /proxy/session/{session_id}:
+    delete:
+      operationId: amplium.api.proxy.delete_session
+      description: Deletes a session.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ok_response'
+
+  /proxy/session/{session_id}/{command}:
+    get:
+      operationId: amplium.api.proxy.get_command
+      description: Proxies the given command to the given session.
+      parameters:
+        - name: command
+          in: path
+          required: true
+          type: string
+          format: path
+        - name: session_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ok_response'
+
+    post:
+      operationId: amplium.api.proxy.post_command
+      description: Proxies the given command to the given session.
+      parameters:
+        - name: command
+          in: path
+          required: true
+          type: string
+          format: path
+        - name: session_id
+          in: path
+          required: true
+          type: string
+        - name: command_params
+          in: body
+          required: false
+          schema:
+            type: object
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ok_response'
+
+    delete:
+      operationId: amplium.api.proxy.delete_command
+      description: Proxies the given command to the given session.
+      parameters:
+        - name: command
+          in: path
+          required: true
+          type: string
+          format: path
+        - name: session_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ok_response'
+
+definitions:
+  ok_response:
+    type: object
+    required:
+      - status
+    properties:
+      status:
+        type: string
+        enum:
+          - OK
+          - ERROR

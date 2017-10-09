@@ -1,0 +1,4 @@
+[pep8]
+max_line_length=110
+# Ignore the requirement that imports be at the beginning of the file
+ignore=E402

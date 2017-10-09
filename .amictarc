@@ -1,0 +1,6 @@
+[logging]
+follow=true
+[build]
+version_from=amplium/version.py
+[targets]
+include=%(environment)sqa-el6*
