@@ -12,6 +12,19 @@ What Does Amplium Do?
 
 Amplium is intended to make it easier to manage multiple Selenium Grid Hubs by removing the some of the difficulties of working with multiple Selenium Grid Hubs. Primarily, Amplium acts as a proxy to mutliple Selenium Selenium Grid Hubs, allowing your tests to seamlessly split between multiple other Selenium Grid Hubs. Additionally, instances of Amplium are stateless, so it is possible to scale Amplium up and down without affecting your running tests.
 
+Quick Start
+===========
+```bash
+rake setup:develop
+AMPLIUM_CONFIG=config/example.yml python amplium/app.py
+```
+
+You'll now have an Amplium server running on `http://0.0.0.0:8081/`.
+
+You can check out the `/status` endpoint and see any actively running sessions.
+
+You can pass `http://0.0.0.0:8081/proxy` as your new Selenium Grid Hub, and now you're Selenium tests will be distributed over multiple Selenium Grid Hubs via Amplium.
+
 Getting Started
 ===============
 Prerequisites
