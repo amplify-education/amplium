@@ -91,7 +91,10 @@ def _get_base_url(new_session):
         if key[0].endswith('Capabilities'):
             # If saucelabs is not used, use zookeeper to find the url
             if saucelabs_handler.is_saucelabs_requested(new_session, key[0]):
-                return saucelabs_handler.get_sauce_url()
+                return retry(
+                    func=saucelabs_handler.get_sauce_url,
+                    max_time=CONFIG.session_queue_time
+                )
 
     ip_address = retry(
         func=_get_ip_address,
