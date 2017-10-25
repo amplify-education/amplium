@@ -69,6 +69,4 @@ def is_saucelabs_available():
     limit = limits.get("mac") or limits.get("real_device", 0)
     usage = usages.get("mac") or usages.get("real_device", 0)
 
-    print limit, usage
-
     return bool(limit - usage)
