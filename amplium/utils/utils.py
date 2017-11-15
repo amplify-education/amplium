@@ -24,3 +24,10 @@ def retry(func, max_time, *args, **kwargs):
                 time_passed = jitter.backoff()
             else:
                 raise
+
+
+def is_truthy(value):
+    """
+    Return true if value resembles a affirmation
+    """
+    return value and value.lower() in ['true', 'yes', 't', 'y', 'aye', '1']
