@@ -1,7 +1,6 @@
 """Unit testing for util/zookeeper.py"""
 import unittest
 
-from kazoo.handlers.threading import KazooTimeoutError
 from mock import patch, MagicMock
 
 from amplium.utils import zookeeper

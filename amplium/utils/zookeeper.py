@@ -21,6 +21,9 @@ class ZookeeperGridNodeStatus(object):
         self.nodes = []
 
     def start_listening(self):
+        """
+        Starts the zookeeper client and sets the watcher
+        """
         self.zookeeper.start()
         ChildrenWatch(self.zookeeper, self.nerve_directory, self.get_nodes)
 
