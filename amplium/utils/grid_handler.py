@@ -42,7 +42,7 @@ class GridHandler(object):
         :return: The URL of that grid.
         """
         if desired_hash not in self.hashes_to_grids:
-            for grid in self.zookeeper.get_nodes():
+            for grid in self.zookeeper.nodes:
                 self.store_grid_url(self._format_url(grid["host"], grid["port"]))
         return self.hashes_to_grids[desired_hash]
 
@@ -155,9 +155,8 @@ class GridHandler(object):
         Convenience function for compiling a list of grids available to Amplium and their capacity.
         :return: List of dictionaries.
         """
-        nodes = self.zookeeper.get_nodes()
         data = []
-        for node in nodes:
+        for node in self.zookeeper.nodes:
             host_data = {'host': node['host'], 'port': node['port']}
             node_ip = self._format_url(node['host'], node['port'])
 

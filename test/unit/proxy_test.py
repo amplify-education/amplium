@@ -93,6 +93,7 @@ class ProxyUnitTests(unittest.TestCase):
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(side_effect=KeyError))
     @patch('amplium.api.proxy.send_request', MagicMock(return_value={}))
+    @patch('kazoo.client.KazooClient.start', MagicMock())
     def def_test_general_exception(self):
         """Test if we create a session and get a general error"""
         test_data = {'desiredCapabilities': {}}

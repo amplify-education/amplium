@@ -1,8 +1,9 @@
 """Tests the config.py"""
-
 import unittest
-from amplium import config
+
 from mock import patch, MagicMock
+
+from amplium import config
 
 
 class ConfigUnitTests(unittest.TestCase):
