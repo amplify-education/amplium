@@ -1,8 +1,9 @@
 """Tests the interal.py"""
-
 import unittest
-from amplium.api import internal
+
 from mock import patch, MagicMock
+
+from amplium.api import internal
 
 
 class InternalUnitTests(unittest.TestCase):

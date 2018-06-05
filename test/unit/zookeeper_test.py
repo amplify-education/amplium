@@ -1,8 +1,9 @@
 """Unit testing for util/zookeeper.py"""
-
 import unittest
-from amplium.utils import zookeeper
+
 from mock import patch, MagicMock
+
+from amplium.utils import zookeeper
 
 
 def mock_requests_get(*args, **kwargs):
@@ -34,20 +35,13 @@ class ZooKeeperUnitTests(unittest.TestCase):
         self.assertEqual(host_data['name'], 'test_node')
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
-    @patch('kazoo.client.KazooClient.get_children', MagicMock(side_effect=zookeeper.KazooTimeoutError))
-    def test_get_nodes_timeout(self):
-        """Tests if get nodes catches timeout error"""
-        mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
-        results = mock_zk.get_nodes()
-        self.assertEqual(results, [])
-
-    @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(return_value=["node1"]))
     @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=[("{'host': 'node1', 'port': 123}", None)]))
     def test_get_nodes(self):
         """Tests that we can get nodes"""
         mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
+        mock_zk.start_listening()
 
-        response = mock_zk.get_nodes()
+        response = mock_zk.nodes
 
         self.assertEquals(response, [{'host': 'node1', 'port': 123}])

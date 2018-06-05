@@ -1,9 +1,10 @@
 """Unit testing for the tracekey.py"""
-
 import unittest
+
 import flask
-from amplium.utils import tracekey
 from mock import patch, MagicMock
+
+from amplium.utils import tracekey
 
 app = flask.Flask(__name__)
 

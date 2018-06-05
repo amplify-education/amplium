@@ -4,7 +4,7 @@ import logging
 
 from kazoo.client import KazooClient
 from kazoo.exceptions import KazooException
-
+from kazoo.recipe.watchers import ChildrenWatch
 
 logger = logging.getLogger(__name__)
 
@@ -17,24 +17,28 @@ class ZookeeperGridNodeStatus(object):
         port = port
         zookeeper_host = "%s:%s" % (host, port)
         self.zookeeper = KazooClient(hosts=zookeeper_host, read_only=True)
-        self.zookeeper.start()
         self.nerve_directory = nerve_directory
+        self.nodes = []
 
-    def get_nodes(self):
+    def start_listening(self):
         """
-        Gets the children
+        Starts the zookeeper client and sets the watcher
+        """
+        self.zookeeper.start()
+        ChildrenWatch(self.zookeeper, self.nerve_directory, self.get_nodes)
 
-        Returns:
-            array:   Returns an array with all the nodes with their data
+    def get_nodes(self, children):
+        """
+        Gets the data for the grid nodes.
+        :param children: A list of Zookeeper nodes to lookup.
+        :return: A list of tuples containing host, port, and name of each grid node.
         """
         try:
-            children = self.zookeeper.retry(self.zookeeper.get_children, self.nerve_directory)
-            ip_addresses = [self.get_grid_node_data(child) for child in children]
-
-            return ip_addresses
+            self.nodes = [self.get_grid_node_data(child) for child in children]
         except KazooException:
             logger.exception("Unable to connect to zookeeper")
-            return []
+            self.nodes = []
+        return True
 
     def get_grid_node_data(self, grid_node):
         """Gets host, port, and name from the grid node"""
