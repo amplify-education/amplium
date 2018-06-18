@@ -27,13 +27,16 @@ class ZookeeperGridNodeStatus(object):
         self.zookeeper.start()
         ChildrenWatch(self.zookeeper, self.nerve_directory, self.get_nodes)
 
-    def get_nodes(self, children):
+    def get_nodes(self, children=None):
         """
         Gets the data for the grid nodes.
-        :param children: A list of Zookeeper nodes to lookup.
+        :param children: A list of Zookeeper nodes to lookup. If None, children will be looked up.
         :return: A list of tuples containing host, port, and name of each grid node.
         """
         try:
+            if children is None:
+                children = self.zookeeper.retry(self.zookeeper.get_children, self.nerve_directory)
+
             self.nodes = [self.get_grid_node_data(child) for child in children]
         except KazooException:
             logger.exception("Unable to connect to zookeeper")
