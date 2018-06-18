@@ -6,6 +6,8 @@ import re
 import logging
 from collections import defaultdict, Counter
 
+from requests.exceptions import RequestException
+
 from amplium.api.exceptions import NoAvailableGridsException, NoAvailableCapacityException
 from amplium.utils.utils import retry
 
@@ -160,17 +162,22 @@ class GridHandler(object):
             host_data = {'host': node['host'], 'port': node['port']}
             node_ip = self._format_url(node['host'], node['port'])
 
-            # Gets the browser usage
-            browsers = self.get_usage_per_browser_type(node_ip)
-            host_data['browsers'] = browsers['breakdown']
+            try:
+                # Gets the browser usage
+                browsers = self.get_usage_per_browser_type(node_ip)
+                host_data['browsers'] = browsers['breakdown']
 
-            # Gets the total capacity
-            host_data['total_capacity'] = self.get_grid_hub_sessions_capacity(node_ip)
-            host_data['available_capacity'] = host_data['total_capacity'] - browsers['total']
+                # Gets the total capacity
+                host_data['total_capacity'] = self.get_grid_hub_sessions_capacity(node_ip)
+                host_data['available_capacity'] = host_data['total_capacity'] - browsers['total']
 
-            # Gets the queue
-            response = self.session.get(node_ip + "/grid/api/hub").json()
-            host_data['queue'] = response['newSessionRequestCount']
+                # Gets the queue
+                response = self.session.get(node_ip + "/grid/api/hub").json()
+                host_data['queue'] = response['newSessionRequestCount']
+            except RequestException:
+                self.zookeeper.get_nodes()
+                continue
+
             data.append(host_data)
 
         return data
