@@ -6,7 +6,7 @@ import re
 import logging
 from collections import defaultdict, Counter
 
-from requests import ConnectionError
+from requests.exceptions import RequestException
 
 from amplium.api.exceptions import NoAvailableGridsException, NoAvailableCapacityException
 from amplium.utils.utils import retry
@@ -174,7 +174,7 @@ class GridHandler(object):
                 # Gets the queue
                 response = self.session.get(node_ip + "/grid/api/hub").json()
                 host_data['queue'] = response['newSessionRequestCount']
-            except ConnectionError:
+            except RequestException:
                 self.zookeeper.get_nodes()
                 continue
 
