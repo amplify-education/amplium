@@ -5,6 +5,7 @@ import logging
 from kazoo.client import KazooClient
 from kazoo.exceptions import KazooException
 from kazoo.recipe.watchers import ChildrenWatch
+from kazoo.retry import KazooRetry
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,8 @@ class ZookeeperGridNodeStatus(object):
         host = host
         port = port
         zookeeper_host = "%s:%s" % (host, port)
-        self.zookeeper = KazooClient(hosts=zookeeper_host, read_only=True)
+        connection_retry = KazooRetry(max_tries=10)
+        self.zookeeper = KazooClient(hosts=zookeeper_host, read_only=True, connection_retry=connection_retry)
         self.nerve_directory = nerve_directory
         self.nodes = []
 
