@@ -9,8 +9,16 @@ from amplium.api import internal
 class InternalUnitTests(unittest.TestCase):
     """Tests the internal.py"""
 
-    @patch('amplium.ZOOKEEPER.get_nodes', MagicMock(return_value={}))
+    @patch('amplium.GRID_HANDLER.get_grid_info', MagicMock(return_value={"some": "data"}))
     def test_get_status(self):
         """Tests the get status function"""
-        result = internal.get_status()
+        result, code = internal.get_status()
         self.assertEqual(result['status'], 'OK')
+        self.assertEqual(code, 200)
+
+    @patch('amplium.GRID_HANDLER.get_grid_info', MagicMock(return_value={}))
+    def test_get_status_without_data(self):
+        """Tests the get status function"""
+        result, code = internal.get_status()
+        self.assertEqual(result['status'], 'OK')
+        self.assertEqual(code, 503)
