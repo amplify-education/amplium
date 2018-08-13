@@ -45,5 +45,5 @@ class DatadogHandler(object):
             )
         except ApiNotInitialized:
             logger.debug("Attempted to send Datadog metric, but Datadog is not initialized.", exc_info=True)
-        except (ClientError, HttpBackoff, HTTPError, HttpTimeout, ApiError):
+        except (ClientError, HttpBackoff, HTTPError, HttpTimeout, ApiError, ValueError):
             logger.warning("Datadog encountered an error", exc_info=True)
