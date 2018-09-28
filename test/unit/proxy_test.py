@@ -161,15 +161,4 @@ class ProxyUnitTests(unittest.TestCase):
         """Tests the request wrapper's timeout exceptions"""
         mock_session.request.side_effect = requests.exceptions.Timeout(response=MagicMock(status_code=408))
         response = proxy.send_request(method='POST', data={'data': 'test'})
-        self.assertEqual(response[0]['message'], 'Timeout occurred while proxying')
-
-    @patch(
-        'amplium.api.proxy.GRID_HANDLER.unroll_session_id',
-        MagicMock(return_value=("test_session_id", "http://test_host_1:1234"))
-    )
-    @patch('amplium.api.proxy.SESSION')
-    def test_request_wrapper_httperror(self, mock_session):
-        """Tests the httperror exception"""
-        mock_session.request.side_effect = requests.exceptions.HTTPError(response=MagicMock(status_code=404))
-        response = proxy.send_request(method='POST', data={'data': 'test'})
-        self.assertEqual(response[0]['message'], 'Http error occurred while proxying')
+        self.assertEqual(response[0]['status'], 408)

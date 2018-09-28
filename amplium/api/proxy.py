@@ -62,11 +62,9 @@ def send_request(method, session_id=None, command=None, data=None, url=None):
         response = SESSION.request(method=method, url=url, json=data)
         logger.info("%s | Received from (%s) with response: %s", session_id, url, response.text)
         return response.json()
-    except requests.HTTPError as error:
-        logger.exception("Http Error: ")
-        return {'status': error.response.status_code, 'message': 'Http error occurred while proxying'},\
+    except (requests.HTTPError, requests.Timeout, requests.ConnectionError) as error:
+        logger.exception("Error while handling request")
+        return (
+            {'status': error.response.status_code, 'message': 'Error occurred while proxying'},
             error.response.status_code
-    except requests.Timeout as error:
-        logger.exception("Timeout Exception: ")
-        return {'status': error.response.status_code, 'message': 'Timeout occurred while proxying'},\
-            error.response.status_code
+        )
