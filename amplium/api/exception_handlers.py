@@ -19,7 +19,7 @@ def handle_unknown_exception(exception):
     return Response(
         response=json.dumps(
             {
-                "value": "Unknown exception has occurred, consult Amplium server logs",
+                "value": "Amplium exception: %s" % str(exception),
                 "status": "ERROR"
             }
         ),
