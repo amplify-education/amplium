@@ -46,6 +46,16 @@ def delete_command(session_id, command):
     return response
 
 
+def get_session_info(session_id):
+    """Retrieve an info about a specific session by executing
+    POST /grid/api/testsession?session={session_id}
+    """
+    session_id_, url_ = GRID_HANDLER.unroll_session_id(session_id)
+    url_ = "{}/grid/api/testsession?session={}".format(url_, session_id_)
+    response = send_request('POST', session_id_, url=url_)
+    return response
+
+
 def send_request(method, session_id=None, command=None, data=None, url=None):
     """Does request call based on command and given url"""
 
