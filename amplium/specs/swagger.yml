@@ -81,7 +81,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/ok_response'
+            $ref: '#/definitions/node_info__response'
 
 
   /proxy/session/{session_id}:
@@ -173,3 +173,16 @@ definitions:
         enum:
           - OK
           - ERROR
+  node_info__response:
+    type: object
+    required:
+      - success
+      - proxyId
+      - session
+    properties:
+      success:
+        type: bool
+      proxyId:
+        type: string
+      session:
+        type: string
