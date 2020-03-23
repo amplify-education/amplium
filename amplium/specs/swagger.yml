@@ -181,7 +181,7 @@ definitions:
       - session
     properties:
       success:
-        type: bool
+        type: boolean
       proxyId:
         type: string
       session:
