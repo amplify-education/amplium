@@ -30,16 +30,6 @@ def mock_zookeeper_get_nodes_filled_queue():
     ]
 
 
-GRID_NODE_INFO = {
-    "inactivityTime": 258610,
-    "internalKey": "86723674-e6c4-4c0b-84e1-9d9b59250134",
-    "msg": "slot found !",
-    "proxyId": "http://10.101.9.142:5555",
-    "session": "6df13e64df39c3d21f65380a0af04213",
-    "success": True
-}
-
-
 @patch('time.sleep', MagicMock())
 class ProxyUnitTests(unittest.TestCase):
     """Unit testing for the proxy.py"""
