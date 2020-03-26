@@ -48,11 +48,21 @@ def delete_command(session_id, command):
 
 def get_session_info(session_id):
     """Retrieve an info about a specific session by executing
-    POST /grid/api/testsession?session={session_id}
+    GET /grid/api/testsession?session={session_id}
+    returns: dict()
+    Example of return data:
+    {
+        "inactivityTime": 258610,
+        "internalKey": "86723674-e6c4-4c0b-84e1-9d9b59250134",
+        "msg": "slot found !",
+        "proxyId": "http:\u002f\u002f10.101.9.142:5555",
+        "session": "6df13e64df39c3d21f65380a0af04213",
+        "success": true
+    }
     """
-    session_id_, url_ = GRID_HANDLER.unroll_session_id(session_id)
-    url_ = "{}/grid/api/testsession?session={}".format(url_, session_id_)
-    response = send_request('POST', session_id_, url=url_)
+    session_id, url_ = GRID_HANDLER.unroll_session_id(session_id)
+    url_ = "{}/grid/api/testsession?session={}".format(url_, session_id)
+    response = send_request('GET', session_id, url=url_)
     return response
 
 
