@@ -30,6 +30,16 @@ def mock_zookeeper_get_nodes_filled_queue():
     ]
 
 
+GRID_NODE_INFO = {
+    "inactivityTime": 258610,
+    "internalKey": "86723674-e6c4-4c0b-84e1-9d9b59250134",
+    "msg": "slot found !",
+    "proxyId": "http://10.101.9.142:5555",
+    "session": "6df13e64df39c3d21f65380a0af04213",
+    "success": True
+}
+
+
 @patch('time.sleep', MagicMock())
 class ProxyUnitTests(unittest.TestCase):
     """Unit testing for the proxy.py"""
@@ -48,6 +58,18 @@ class ProxyUnitTests(unittest.TestCase):
             'POST',
             data=mock_request_data,
             url='http://test_host1:1234/wd/hub/session'
+        )
+
+    @patch('amplium.api.proxy.GRID_HANDLER.unroll_session_id',
+           MagicMock(return_value=("test_session_id", "http://test_node_1:1234")))
+    @patch('amplium.api.proxy.send_request')
+    def test_get_session_info(self, mock_request):
+        """Test a correct request while getting Grid node info from session_id."""
+        proxy.get_session_info(session_id="ea88098b344441de443-4d7f48c3f749a")
+        mock_request.assert_called_once_with(
+            'GET',
+            "test_session_id",
+            url='http://test_node_1:1234/grid/api/testsession?session=test_session_id'
         )
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(return_value='http://test_host_1:1234'))
