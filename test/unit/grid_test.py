@@ -139,7 +139,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         our_session_id = self.grid.generate_session_id(session_id=original_session_id, grid_url=grid_url)
 
-        self.assertEquals((original_session_id, grid_url), self.grid.unroll_session_id(our_session_id))
+        self.assertEqual((original_session_id, grid_url), self.grid.unroll_session_id(our_session_id))
 
     def test_no_available_capacity_error(self):
         """Tests that we raise an exception if there is no available capacity"""
@@ -168,7 +168,7 @@ class ProxyUnitTests(unittest.TestCase):
         mock_requests.get(requests_mock.ANY, json=mock_response)
 
         response = self.grid.get_grid_info()
-        self.assertEquals(
+        self.assertEqual(
             response,
             [
                 {
@@ -192,7 +192,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         actual_urls = self.grid.get_all_registered_nodes_ip("http://this doesnt matter")
 
-        self.assertEquals(actual_urls, [url])
+        self.assertEqual(actual_urls, [url])
 
     @requests_mock.Mocker()
     def test_calc_capacity_works(self, mock_requests):
@@ -211,7 +211,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         response = self.grid.get_grid_hub_sessions_capacity("http://this doesnt matter")
 
-        self.assertEquals(response, 100)
+        self.assertEqual(response, 100)
 
     @requests_mock.Mocker()
     def test_get_browser_usage(self, mock_requests):
@@ -239,7 +239,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         response = self.grid.get_usage_per_browser_type("http://this doesnt matter")
 
-        self.assertEquals(
+        self.assertEqual(
             response,
             {
                 'breakdown': {
@@ -282,7 +282,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         response = self.grid.get_usage_per_browser_type("http://this doesnt matter")
 
-        self.assertEquals(
+        self.assertEqual(
             response,
             {
                 'breakdown': {

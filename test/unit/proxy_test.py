@@ -84,8 +84,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 429)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 429)
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(side_effect=NoAvailableCapacityException))
     @patch('amplium.api.proxy.send_request', MagicMock(return_value={}))
@@ -100,8 +100,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 429)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 429)
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(side_effect=KeyError))
     @patch('amplium.api.proxy.send_request', MagicMock(return_value={}))
@@ -117,8 +117,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 500)
 
     @patch(
         'amplium.api.proxy.GRID_HANDLER.unroll_session_id',
