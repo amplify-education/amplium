@@ -60,7 +60,7 @@ def get_session_info(session_id):
         "success": true
     }
     """
-    session_id, url_ = GRID_HANDLER.unroll_session_id(session_id)
+    _, url_ = GRID_HANDLER.unroll_session_id(session_id)
     url_ = "{}/grid/api/testsession?session={}".format(url_, session_id)
     response = send_request('GET', session_id, url=url_)
     return response
