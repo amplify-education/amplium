@@ -58,7 +58,7 @@ class ProxyUnitTests(unittest.TestCase):
         proxy.get_session_info(session_id="ea88098b344441de443-4d7f48c3f749a")
         mock_request.assert_called_once_with(
             'GET',
-            "test_session_id",
+            'test_session_id',
             url='http://test_node_1:1234/grid/api/testsession?session=test_session_id'
         )
 
