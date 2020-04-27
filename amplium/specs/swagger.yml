@@ -68,6 +68,22 @@ paths:
           schema:
             $ref: '#/definitions/ok_response'
 
+  /proxy/api/session/{session_id}:
+    get:
+      operationId: amplium.api.proxy.get_session_info
+      description: Return an info about a specific session.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/node_info_response'
+
+
   /proxy/session/{session_id}:
     delete:
       operationId: amplium.api.proxy.delete_session
@@ -157,3 +173,16 @@ definitions:
         enum:
           - OK
           - ERROR
+  node_info_response:
+    type: object
+    required:
+      - success
+      - proxyId
+      - session
+    properties:
+      success:
+        type: boolean
+      proxyId:
+        type: string
+      session:
+        type: string

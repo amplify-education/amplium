@@ -45,7 +45,7 @@ class ZooKeeperUnitTests(unittest.TestCase):
 
         response = mock_zk.nodes
 
-        self.assertEquals(response, [{'host': 'node1', 'port': 123}])
+        self.assertEqual(response, [{'host': 'node1', 'port': 123}])
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(return_value=["node1"]))
@@ -57,7 +57,7 @@ class ZooKeeperUnitTests(unittest.TestCase):
 
         response = mock_zk.nodes
 
-        self.assertEquals(response, [{'host': 'node1', 'port': 123}])
+        self.assertEqual(response, [{'host': 'node1', 'port': 123}])
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(side_effect=KazooException()))
@@ -68,4 +68,4 @@ class ZooKeeperUnitTests(unittest.TestCase):
 
         response = mock_zk.nodes
 
-        self.assertEquals(response, [])
+        self.assertEqual(response, [])

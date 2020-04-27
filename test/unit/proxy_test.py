@@ -50,6 +50,18 @@ class ProxyUnitTests(unittest.TestCase):
             url='http://test_host1:1234/wd/hub/session'
         )
 
+    @patch('amplium.api.proxy.GRID_HANDLER.unroll_session_id',
+           MagicMock(return_value=("test_session_id", "http://test_node_1:1234")))
+    @patch('amplium.api.proxy.send_request')
+    def test_get_session_info(self, mock_request):
+        """Test a correct request while getting Grid node info from session_id."""
+        proxy.get_session_info(session_id="ea88098b344441de443-4d7f48c3f749a")
+        mock_request.assert_called_once_with(
+            'GET',
+            'test_session_id',
+            url='http://test_node_1:1234/grid/api/testsession?session=test_session_id'
+        )
+
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(return_value='http://test_host_1:1234'))
     @patch('amplium.api.proxy.SESSION')
     def test_create_session_send_request(self, mock_session):
@@ -72,8 +84,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 429)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 429)
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(side_effect=NoAvailableCapacityException))
     @patch('amplium.api.proxy.send_request', MagicMock(return_value={}))
@@ -88,8 +100,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 429)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 429)
 
     @patch('amplium.api.proxy.GRID_HANDLER.get_base_url', MagicMock(side_effect=KeyError))
     @patch('amplium.api.proxy.send_request', MagicMock(return_value={}))
@@ -105,8 +117,8 @@ class ProxyUnitTests(unittest.TestCase):
         response_json = json.loads(response.data)
 
         self.assertIn("value", response_json.keys())
-        self.assertEquals(response_json["status"], "ERROR")
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response_json["status"], "ERROR")
+        self.assertEqual(response.status_code, 500)
 
     @patch(
         'amplium.api.proxy.GRID_HANDLER.unroll_session_id',
