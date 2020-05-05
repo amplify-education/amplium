@@ -1,9 +1,10 @@
-"""Contains exception handlers for Flask/Connexion"""
+"""Contains exception handlers for Connexion"""
 import json
 import logging
 
-from flask import Response
+from aiohttp.web import Response
 
+from amplium.api.exceptions import AmpliumException
 
 logger = logging.getLogger(__name__)
 
@@ -17,18 +18,18 @@ def handle_unknown_exception(exception):
     """
     logger.exception("Unknown exception encountered:")
     return Response(
-        response=json.dumps(
+        body=json.dumps(
             {
                 "value": "Amplium exception: %s" % str(exception),
                 "status": "ERROR"
             }
         ),
         status=500,
-        mimetype="application/json"
+        content_type="application/json"
     )
 
 
-def handle_amplium_exception(exception):
+def handle_amplium_exception(exception: AmpliumException):
     """
     Returns a custom response for any unhandled Amplium exceptions
     :param exception: The exception to handle. Must be subclassed from AmpliumException.
@@ -36,12 +37,12 @@ def handle_amplium_exception(exception):
     """
     logger.exception("Amplium exception encountered:")
     return Response(
-        response=json.dumps(
+        body=json.dumps(
             {
                 "value": exception.error,
                 "status": "ERROR"
             }
         ),
         status=exception.status_code,
-        mimetype="application/json"
+        content_type="application/json"
     )

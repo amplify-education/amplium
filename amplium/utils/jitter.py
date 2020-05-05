@@ -3,7 +3,7 @@ import time
 from random import randint
 
 
-class Jitter(object):
+class Jitter:
     """
     This class implements the logic to run a function using Backoff with Decorrelated Jitter.
     The logic is based on the following article:

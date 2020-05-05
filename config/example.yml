@@ -1,7 +1,11 @@
-zookeeper:
-  host: '127.0.0.1' # IP of zookeeper instance
-  port: 2181 # Port of zookeeper instance
-  selenium_grid_zookeeper_path: '/nerve/services/selenium_grid/services' # Path to selenium grid hub services in zookeeper
+#zookeeper:
+#  host: '10.101.10.152' # IP of zookeeper instance
+#  port: 2181 # Port of zookeeper instance
+#  selenium_grid_zookeeper_path: '/nerve/services/selenium_grid/services' # Path to selenium grid hub services in zookeeper
+consul:
+  host: 'consul-ci.discovery-uw2.aws.wgen.net' # IP of zookeeper instance
+  port: 8500 # Port of zookeeper instance
+  selenium_grid_service_name: 'selenium_grid' # Path to selenium grid hub services in zookeeper
 
 logging:
   version: 1

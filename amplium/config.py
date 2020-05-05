@@ -7,7 +7,7 @@ from schema import Schema, Use, And, Optional
 
 SCHEMA_CONFIG = Schema(
     {
-        "zookeeper": {
+        Optional("zookeeper"): {
             "host": Use(str),
             "port": And(
                 Use(int),
@@ -15,6 +15,15 @@ SCHEMA_CONFIG = Schema(
                 error="Port must be an integer between 1 and 65535"
             ),
             "selenium_grid_zookeeper_path": Use(str),
+        },
+        Optional("consul"): {
+            "host": Use(str),
+            "port": And(
+                Use(int),
+                lambda n: 1 <= n <= 65535,
+                error="Port must be an integer between 1 and 65535"
+            ),
+            "selenium_grid_service_name": Use(str),
         },
         "logging": {
             Optional("version", default=1): Use(int),
@@ -73,7 +82,7 @@ DEFAULT_CONFIG_PATH = '/etc/amplium/config.yml'
 logger = logging.getLogger(__name__)
 
 
-class Config(object):
+class Config:
     """Class for parsing Amplium's config file"""
 
     def __init__(self, config=None):
@@ -97,6 +106,11 @@ class Config(object):
     def zookeeper(self):
         """Dictionary containing zookeeper configuration"""
         return self._config.get('zookeeper')
+
+    @property
+    def consul(self):
+        """Dictionary containing zookeeper configuration"""
+        return self._config.get('consul')
 
     @property
     def logging(self):

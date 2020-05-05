@@ -35,6 +35,7 @@ def get_requirements():
     with open("requirements.pip") as reqfile:
         return filter(lambda line: not line.startswith(('#', '-')), reqfile.read().split("\n"))
 
+
 setup(
     name='amplium',
     version=get_version(),
