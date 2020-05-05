@@ -23,7 +23,6 @@ class ConsulGridNodeStatus(AbstractDiscovery):
             index = None
             while True:
                 [index, data] = await self.consul.catalog.service(self.service_name, index=index)
-                print(index, data)
                 nodes = []
                 for node in data:
                     nodes.append(self._get_grid_node_data(node))
