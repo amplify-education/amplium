@@ -43,8 +43,12 @@ setup(
     long_description="",
     # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     keywords='',
     author='Amplify Education',
