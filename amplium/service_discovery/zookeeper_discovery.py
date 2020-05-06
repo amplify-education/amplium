@@ -28,6 +28,7 @@ class ZookeeperGridNodeStatus(AbstractDiscovery):
         """
         Starts the zookeeper client and sets the watcher
         """
+
         self.zookeeper.start()
         ChildrenWatch(self.zookeeper, self.nerve_directory, self.get_nodes)
 
@@ -42,6 +43,7 @@ class ZookeeperGridNodeStatus(AbstractDiscovery):
                 children = self.zookeeper.retry(self.zookeeper.get_children, self.nerve_directory)
 
             self.nodes = [self._get_grid_node_data(child) for child in children]
+            logger.info('Setting grid node data %s', self.nodes)
         except KazooException:
             logger.exception("Unable to connect to zookeeper")
             self.nodes = []

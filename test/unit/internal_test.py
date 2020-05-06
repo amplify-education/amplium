@@ -1,4 +1,5 @@
 """Tests the interal.py"""
+import json
 import unittest
 
 from mock import patch, MagicMock
@@ -12,13 +13,13 @@ class InternalUnitTests(unittest.TestCase):
     @patch('amplium.GRID_HANDLER.get_grid_info', MagicMock(return_value={"some": "data"}))
     def test_get_status(self):
         """Tests the get status function"""
-        result, code = internal.get_status()
-        self.assertEqual(result['status'], 'OK')
-        self.assertEqual(code, 200)
+        response = internal.get_status()
+        self.assertEqual(json.loads(response.text)['status'], 'OK')
+        self.assertEqual(response.status, 200)
 
     @patch('amplium.GRID_HANDLER.get_grid_info', MagicMock(return_value={}))
     def test_get_status_without_data(self):
         """Tests the get status function"""
-        result, code = internal.get_status()
-        self.assertEqual(result['status'], 'OK')
-        self.assertEqual(code, 503)
+        response = internal.get_status()
+        self.assertEqual(json.loads(response.text)['status'], 'OK')
+        self.assertEqual(response.status, 503)

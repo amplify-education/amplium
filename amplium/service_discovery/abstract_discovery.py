@@ -13,3 +13,7 @@ class AbstractDiscovery(ABC):
     @abstractmethod
     def get_nodes(self, children: List[str] = None):
         """Force a update of the local nodes cache"""
+
+    @abstractmethod
+    def start_listening(self):
+        """Start polling the backend for node data"""

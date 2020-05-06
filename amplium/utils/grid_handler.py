@@ -48,7 +48,7 @@ class GridHandler:
                 self.store_grid_url(self._format_url(grid.host, grid.port))
         return self.hashes_to_grids[desired_hash]
 
-    def generate_session_id(self, session_id, grid_url):
+    def generate_session_id(self, session_id, grid_url) -> str:
         """
         Convenience function for generating our own session id on top of the Selenium Grid's session id.
         :param session_id: The original session id used by Selenium.

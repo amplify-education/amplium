@@ -1,5 +1,6 @@
 """Root handler for the API"""
 import logging
+from aiohttp.web_response import json_response
 
 from amplium import GRID_HANDLER
 
@@ -11,4 +12,7 @@ def get_status():
     data = GRID_HANDLER.get_grid_info()
     data_packet = {"status": "OK", "nodes": data}
     status_code = 200 if data else 503
-    return data_packet, status_code
+    return json_response(
+        data=data_packet,
+        status=status_code
+    )

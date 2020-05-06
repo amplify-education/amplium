@@ -1,19 +1,20 @@
 """ Run of the Amplium application """
-import asyncio
 
 import connexion
 from aiohttp.web_middlewares import middleware
 
-from amplium import DISCOVERY, ConsulGridNodeStatus, ZookeeperGridNodeStatus
+from amplium import DISCOVERY
 from amplium.api.exception_handlers import handle_amplium_exception, handle_unknown_exception
 from amplium.api.exceptions import AmpliumException
+from amplium.utils.tracekey import trace_key_middleware
 
 
 @middleware
-async def error_handler(request, handler):
+async def error_handler_middleware(request, handler):
     """Handle errors thrown while processing a request"""
     try:
-        return await handler(request)
+        response = await handler(request)
+        return response
     except AmpliumException as ex:
         return handle_amplium_exception(ex)
     except Exception as ex:
@@ -35,18 +36,22 @@ app.add_api(
 application = app.app
 
 # Append error handling middleware
-application.middlewares.append(error_handler)
+application.middlewares.append(error_handler_middleware)
 
-loop = asyncio.get_event_loop()
+# Append trace key middle
+application.middlewares.append(trace_key_middleware)
+
+
+async def start_listener(*_):
+    """
+    Wrap the discovery method start_listening function in a async wrapper so it can be run as a task
+    during application startup
+    """
+    DISCOVERY.start_listening()
+
+
 if __name__ == '__main__':
-    if isinstance(DISCOVERY, ConsulGridNodeStatus):
-        consul_discovery: ConsulGridNodeStatus = DISCOVERY
-        application['dispatch'] = loop.create_task(consul_discovery.start_listening())
-    elif isinstance(DISCOVERY, ZookeeperGridNodeStatus):
-        zookeeper_discovery: ZookeeperGridNodeStatus = DISCOVERY
-        zookeeper_discovery.start_listening()
-    else:
-        raise Exception('Invalid Service Discovery Class')
+    application.on_startup.append(start_listener)
 
     app.run(
         port=8081,
