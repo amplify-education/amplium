@@ -36,9 +36,6 @@ class ProxyUnitTests(unittest.TestCase):
     """Unit testing for the proxy.py"""
 
     def setUp(self):
-        # self.app = app.app.test_client()
-        # self.app.testing = True
-
         self.saucelabs = MagicMock()
         self.zookeeper = MagicMock()
         self.datadog = MagicMock()

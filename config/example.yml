@@ -14,8 +14,18 @@ logging:
     '':
       level: INFO
       handlers:
+        - stdoutHandler
+    amplium:
+      level: INFO
+      handlers:
         - ampliumStdoutHandler
+      propagate: False
   handlers:
+    stdoutHandler:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: simpleFormatter
+      stream: 'ext://sys.stdout'
     ampliumStdoutHandler:
       class: logging.StreamHandler
       level: DEBUG
@@ -24,6 +34,8 @@ logging:
       filters:
         - tracekey
   formatters:
+    simpleFormatter:
+      format: '[%(asctime)s] | %(name)s | %(levelname)s | %(message)s'
     tracekeyFormatter:
       format: '[%(asctime)s] | %(name)s | %(levelname)s| %(tracekey)s | %(message)s'
   filters:

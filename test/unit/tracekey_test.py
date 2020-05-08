@@ -1,14 +1,15 @@
 """Unit testing for the tracekey.py"""
+import unittest
 
-import aiounittest
-from aiounittest import futurized
+import flask
 from mock import patch, MagicMock
 
 from amplium.utils import tracekey
-from amplium.utils.tracekey import TRACE_KEY, trace_key_middleware
+
+app = flask.Flask(__name__)
 
 
-class TraceKeyUnitTests(aiounittest.AsyncTestCase):
+class TraceKeyUnitTests(unittest.TestCase):
     """Unit testing for the tracekey.py"""
 
     @patch('uuid.uuid1', MagicMock(return_value='test_uuid'))
@@ -24,21 +25,21 @@ class TraceKeyUnitTests(aiounittest.AsyncTestCase):
         response = tracekey.generate_tracekey('test_original')
         self.assertEqual(response, 'test_original/test_uuid')
 
-    async def test_tracekey(self):
-        """Tests tracekey if tracekey is set. Should return context var's tracekey"""
-        TRACE_KEY.set('test_tracekey')
-        mock_request = MagicMock()
-        mock_request.headers = {}
-        await trace_key_middleware(mock_request, MagicMock(return_value=futurized(None)))
-        self.assertEqual(TRACE_KEY.get(), 'test_tracekey')
+    def test_tracekey(self):
+        """Tests tracekey if flask.g.tracekey is set,
+        should return flask.g.tracekey's tracekey"""
+        with app.test_request_context():
+            flask.g.tracekey = 'test_tracekey'
+            response = tracekey.tracekey()
+            self.assertEqual(response, 'test_tracekey')
 
     @patch('uuid.uuid1', MagicMock(return_value='test_uuid'))
-    async def test_tracekey_original(self):
-        """Tests if a tracekey has not been set. Should return a new generated uuid"""
-        mock_request = MagicMock()
-        mock_request.headers = {}
-        await trace_key_middleware(mock_request, MagicMock(return_value=futurized(None)))
-        self.assertEqual(TRACE_KEY.get(), 'test_uuid')
+    def test_tracekey_original(self):
+        """Tests if a tracekey.g has not been set,
+        Returns a new generated uuid"""
+        with app.test_request_context():
+            response = tracekey.tracekey()
+            self.assertEqual(response, 'test_uuid')
 
     def test_filter(self):
         """Tests the TracekeyFilter filter method. Should return true."""
@@ -48,6 +49,8 @@ class TraceKeyUnitTests(aiounittest.AsyncTestCase):
 
     def test_filter_request(self):
         """Tests if the flask has request context(). Should return true"""
-        tracekey_class = tracekey.TracekeyFilter()
-        response = tracekey_class.filter(MagicMock(tracekey='test'))
-        self.assertEqual(response, True)
+
+        with app.test_request_context():
+            tracekey_class = tracekey.TracekeyFilter()
+            response = tracekey_class.filter(MagicMock(tracekey='test'))
+            self.assertEqual(response, True)
