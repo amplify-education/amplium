@@ -3,8 +3,6 @@ import asyncio
 import logging
 import threading
 
-from time import sleep
-
 from typing import Dict, List
 
 import consul.aio
@@ -49,7 +47,7 @@ class ConsulGridNodeStatus(AbstractDiscovery):
             except Exception:
                 logger.exception('Error connecting to Consul')
                 # sleep for a few seconds so we don't end up in a tight infinite loop
-                await sleep(10)
+                await asyncio.sleep(5)
 
     def get_nodes(self, _: List[str] = None):
         # do nothing because the listen task will automatically restart if there are any errors
