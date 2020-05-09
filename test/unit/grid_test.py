@@ -6,9 +6,9 @@ import requests_mock
 from mock import patch, MagicMock
 
 from amplium import CONFIG
-from amplium.utils.grid_handler import GridHandler
 from amplium.api.exceptions import NoAvailableGridsException, NoAvailableCapacityException
-from amplium.app import app
+from amplium.models.grid_node_data import GridNodeData
+from amplium.utils.grid_handler import GridHandler
 
 test_sauce_url = 'https://username:accesskey@ondemand.saucelabs.com:443'
 
@@ -36,9 +36,6 @@ class ProxyUnitTests(unittest.TestCase):
     """Unit testing for the proxy.py"""
 
     def setUp(self):
-        self.app = app.app.test_client()
-        self.app.testing = True
-
         self.saucelabs = MagicMock()
         self.zookeeper = MagicMock()
         self.datadog = MagicMock()
@@ -46,7 +43,7 @@ class ProxyUnitTests(unittest.TestCase):
 
         self.grid = GridHandler(
             config=CONFIG,
-            zookeeper=self.zookeeper,
+            discovery=self.zookeeper,
             datadog=self.datadog,
             saucelabs=self.saucelabs,
             session=self.session
@@ -129,8 +126,8 @@ class ProxyUnitTests(unittest.TestCase):
 
     def test_retrieve_hash_before_inserted(self):
         """Tests that we can retrieve a hash for a grid before its inserted"""
-        self.zookeeper.nodes = [{"host": "test", "port": "123"}]
-        self.grid.retrieve_grid_url("7ff06634c8d020b5d620db09c0d9dcbf5db4b44fb3a2b7ab2b4c5656a4254bae")
+        self.zookeeper.nodes = [GridNodeData(name=None, host="test_host_1", port=1234)]
+        self.grid.retrieve_grid_url("518153ffa792841450eb8ba0b0a32d8fb5a1d216a8df1443152857fa0949e262")
 
     def test_unroll_session_id(self):
         """Tests that we can unroll our own session id into the original url and session id"""
@@ -158,7 +155,7 @@ class ProxyUnitTests(unittest.TestCase):
     @requests_mock.Mocker()
     def test_get_grid_info_happy_path(self, mock_requests):
         """Tests that get grid info works on the happy path"""
-        self.zookeeper.nodes = [{"host": "test_host_1", "port": 1234}]
+        self.zookeeper.nodes = [GridNodeData(name=None, host="test_host_1", port=1234)]
         self.grid.get_usage_per_browser_type = MagicMock(return_value={"total": 0, "breakdown": {}})
         self.grid.get_grid_hub_sessions_capacity = MagicMock(return_value=0)
         mock_response = {
@@ -188,7 +185,7 @@ class ProxyUnitTests(unittest.TestCase):
         url = "https://test_url:443"
         mock_response = "asdasfasdasfasdasfasdasdasdasd id : %s dsadasdasdasdasd" % url
 
-        mock_requests.get(requests_mock.ANY, content=mock_response)
+        mock_requests.get(requests_mock.ANY, text=mock_response)
 
         actual_urls = self.grid.get_all_registered_nodes_ip("http://this doesnt matter")
 

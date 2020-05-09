@@ -9,4 +9,3 @@ class FunctionalBase(TestCase):
     """
     Base class for functional tests
     """
-    pass

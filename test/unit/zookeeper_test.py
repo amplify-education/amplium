@@ -4,7 +4,8 @@ import unittest
 from kazoo.exceptions import KazooException
 from mock import patch, MagicMock
 
-from amplium.utils import zookeeper
+from amplium import ZookeeperGridNodeStatus
+from amplium.models.grid_node_data import GridNodeData
 
 
 def mock_requests_get(*args, **kwargs):
@@ -17,8 +18,8 @@ def mock_requests_get(*args, **kwargs):
 
 
 mock_kazoo_get = MagicMock(return_value=('{"host":"test_host","port":1234,"name":"test_node"}', ))
-mock_all_registered_nodes_ip = 'amplium.utils.zookeeper.ZookeeperGridNodeStatus.get_all_registered_nodes_ip'
-mock_grid_hub_session = 'amplium.utils.zookeeper.ZookeeperGridNodeStatus.get_grid_hub_sessions_capacity'
+mock_all_registered_nodes_ip = 'amplium.utils.ZookeeperGridNodeStatus.get_all_registered_nodes_ip'
+mock_grid_hub_session = 'amplium.utils.ZookeeperGridNodeStatus.get_grid_hub_sessions_capacity'
 mock_get = 'amplium.utils.zookeeper.requests.get'
 
 
@@ -26,44 +27,44 @@ class ZooKeeperUnitTests(unittest.TestCase):
     """Tests for zookeeper.py"""
 
     @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=mock_kazoo_get))
-    @patch('amplium.utils.zookeeper', MagicMock())
+    @patch('amplium.service_discovery.zookeeper_discovery.ZookeeperGridNodeStatus', MagicMock())
     def test_get_node_data(self):
         """Tests if the get_node_data parses the json file given"""
-        mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
-        host_data = mock_zk.get_grid_node_data('test_path')
-        self.assertEqual(host_data['host'], "test_host")
-        self.assertEqual(host_data['port'], 1234)
-        self.assertEqual(host_data['name'], 'test_node')
+        mock_zk = ZookeeperGridNodeStatus('test_path', 0, 1234)
+        host_data = mock_zk._get_grid_node_data('test_path')
+        self.assertEqual(host_data.host, "test_host")
+        self.assertEqual(host_data.port, 1234)
+        self.assertEqual(host_data.name, 'test_node')
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(return_value=["node1"]))
-    @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=[("{'host': 'node1', 'port': 123}", None)]))
+    @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=[('{"host": "node1", "port": 123}', None)]))
     def test_start_listening(self):
         """Tests that we can listen for changes"""
-        mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
+        mock_zk = ZookeeperGridNodeStatus('test_path', 0, 1234)
         mock_zk.start_listening()
 
         response = mock_zk.nodes
 
-        self.assertEqual(response, [{'host': 'node1', 'port': 123}])
+        self.assertEqual(response, [GridNodeData(name=None, host='node1', port=123)])
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(return_value=["node1"]))
-    @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=[("{'host': 'node1', 'port': 123}", None)]))
+    @patch('kazoo.client.KazooClient.get', MagicMock(side_effect=[('{"host": "node1", "port": 123}', None)]))
     def test_get_nodes(self):
         """Tests that we can get nodes without providing children"""
-        mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
+        mock_zk = ZookeeperGridNodeStatus('test_path', 0, 1234)
         mock_zk.get_nodes()
 
         response = mock_zk.nodes
 
-        self.assertEqual(response, [{'host': 'node1', 'port': 123}])
+        self.assertEqual(response, [GridNodeData(name=None, host='node1', port=123)])
 
     @patch('kazoo.client.KazooClient.start', MagicMock())
     @patch('kazoo.client.KazooClient.get_children', MagicMock(side_effect=KazooException()))
     def test_get_nodes_exception(self):
         """Tests that we can tolerate zookeeper errors in getting nodes"""
-        mock_zk = zookeeper.ZookeeperGridNodeStatus('test_path', 0, 1234)
+        mock_zk = ZookeeperGridNodeStatus('test_path', 0, 1234)
         mock_zk.get_nodes()
 
         response = mock_zk.nodes

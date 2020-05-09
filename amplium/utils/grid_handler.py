@@ -2,10 +2,10 @@
 
 import hashlib
 import json
-import re
 import logging
 from collections import defaultdict, Counter
 
+import re
 from requests.exceptions import RequestException
 
 from amplium.api.exceptions import NoAvailableGridsException, NoAvailableCapacityException
@@ -14,13 +14,13 @@ from amplium.utils.utils import retry
 logger = logging.getLogger(__name__)
 
 
-class GridHandler(object):
+class GridHandler:
     """Class for handling grid state"""
 
-    def __init__(self, config, zookeeper, datadog, saucelabs, session):
+    def __init__(self, config, discovery, datadog, saucelabs, session):
         self.hashes_to_grids = {}
         self.config = config
-        self.zookeeper = zookeeper
+        self.discovery = discovery
         self.datadog = datadog
         self.saucelabs = saucelabs
         self.session = session
@@ -31,7 +31,7 @@ class GridHandler(object):
         :param url: The URL of the grid.
         :return: The MD5 hash for later lookup of this grid.
         """
-        generated_hash = hashlib.sha256(url).hexdigest()
+        generated_hash = hashlib.sha256(url.encode()).hexdigest()
 
         self.hashes_to_grids[generated_hash] = url
 
@@ -44,11 +44,11 @@ class GridHandler(object):
         :return: The URL of that grid.
         """
         if desired_hash not in self.hashes_to_grids:
-            for grid in self.zookeeper.nodes:
-                self.store_grid_url(self._format_url(grid["host"], grid["port"]))
+            for grid in self.discovery.nodes:
+                self.store_grid_url(self._format_url(grid.host, grid.port))
         return self.hashes_to_grids[desired_hash]
 
-    def generate_session_id(self, session_id, grid_url):
+    def generate_session_id(self, session_id, grid_url) -> str:
         """
         Convenience function for generating our own session id on top of the Selenium Grid's session id.
         :param session_id: The original session id used by Selenium.
@@ -81,7 +81,7 @@ class GridHandler(object):
         :return: A URL to a Selenium Grid matching the session request.
         """
         # Look through the request keys for capabilities, because they might want to use SauceLabs
-        for key, value in session_request.iteritems():
+        for key, value in session_request.items():
             if key.endswith('Capabilities'):
                 # If SauceLabs is not used, use zookeeper to find the url
                 if self.saucelabs.is_saucelabs_requested(value):
@@ -117,7 +117,7 @@ class GridHandler(object):
                 grid for grid in discovered_grids
                 if grid['available_capacity'] > 0
             ],
-            cmp=self._compare_node
+            key=_cmp_to_key(self._compare_node)
         )
 
         if nodes:
@@ -158,9 +158,9 @@ class GridHandler(object):
         :return: List of dictionaries.
         """
         data = []
-        for node in self.zookeeper.nodes:
-            host_data = {'host': node['host'], 'port': node['port']}
-            node_ip = self._format_url(node['host'], node['port'])
+        for node in self.discovery.nodes:
+            host_data = {'host': node.host, 'port': node.port}
+            node_ip = self._format_url(node.host, node.port)
 
             try:
                 # Gets the browser usage
@@ -175,7 +175,7 @@ class GridHandler(object):
                 response = self.session.get(node_ip + "/grid/api/hub").json()
                 host_data['queue'] = response['newSessionRequestCount']
             except RequestException:
-                self.zookeeper.get_nodes()
+                self.discovery.get_nodes()
                 continue
 
             data.append(host_data)
@@ -183,14 +183,14 @@ class GridHandler(object):
         return data
 
     def get_all_registered_nodes_ip(self, url):
-        "Get all ip of nodes registered to the selenium hub"
-        html_content = self.session.get(url + '/grid/console').content
+        """Get all ip of nodes registered to the selenium hub"""
+        html_content = self.session.get(url + '/grid/console').content.decode()
         # get all ips from the html of the grid console
         nodes_ip_list = re.findall('id : (http[s]?://.+?:[0-9]{1,5})', html_content)
         return nodes_ip_list
 
     def get_grid_hub_sessions_capacity(self, url):
-        "Get max sessions capacity of the grid"
+        """Get max sessions capacity of the grid"""
         hub_max_capacity = 0
         # get all max sessions info from each nodes configuration
         for node in self.get_all_registered_nodes_ip(url):
@@ -215,6 +215,7 @@ class GridHandler(object):
         for node in nodes:
 
             for browser in node['value']:
+                capabilities = None
                 try:
                     capabilities = browser['capabilities']
                     browser_name = capabilities['browserName']
@@ -230,7 +231,34 @@ class GridHandler(object):
         browser_stats_dict["breakdown"] = {}
         for browser_type in browser_versions:
             browser_stats_dict["breakdown"][browser_type] = {
-                'version': {versions_number: number for versions_number, number in
-                            Counter(browser_versions[browser_type]).iteritems()}
+                'version': Counter(browser_versions[browser_type])
             }
         return browser_stats_dict
+
+
+def _cmp_to_key(mycmp):
+    """Convert a cmp= function into a key= function"""
+    class Key:
+        """Convert a cmp= function into a key= function"""
+        def __init__(self, obj):
+            self.obj = obj
+
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+
+        def __ne__(self, other):
+            return mycmp(self.obj, other.obj) != 0
+
+    return Key

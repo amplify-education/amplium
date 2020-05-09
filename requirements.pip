@@ -8,3 +8,5 @@ boto3>=1.4.4,<2
 pathlib>=1.0.1,<2
 datadog>=0.16.0,<1
 Werkzeug>=0.16.1,<1
+python-consul>=1.1.0,<2
+aiohttp>=3.6.2,<4

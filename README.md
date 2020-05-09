@@ -15,7 +15,8 @@ Amplium is intended to make it easier to manage multiple Selenium Grid Hubs by r
 Quick Start
 ===========
 ```bash
-rake setup:develop
+pip install -e .
+pip install -r requirements.pip
 AMPLIUM_CONFIG=config/example.yml python amplium/app.py
 ```
 
@@ -31,25 +32,15 @@ Prerequisites
 -------------
 Amplium requires the following:
 ```
-ruby >= 2.3.3
-rake >= 10.4.2
-python >= 2.7.12
+tox>=2.9.1
+python >= 3.7
 ```
-
-Installing/Building
-----------
-Simply run:
-```
-rake setup:develop
-```
-
-To verify everything is installed correctly, try running the unit tests with `rake test`.
 
 Running Tests
 -------------
-Amplium uses rake as its test runner. To run the linters and unit tests, simply run:
+Amplium uses tox as its test runner. To run the linters and unit tests, simply run:
 ```bash
-rake test
+tox
 ```
 
 Configuration

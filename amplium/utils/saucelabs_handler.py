@@ -6,7 +6,7 @@ from amplium.api.exceptions import IntegrationNotConfigured, NoAvailableCapacity
 logger = logging.getLogger(__name__)
 
 
-class SauceLabsHandler(object):
+class SauceLabsHandler:
     """Handles SauceLabs stuff"""
 
     def __init__(self, config, session):
@@ -26,8 +26,7 @@ class SauceLabsHandler(object):
 
         if self.is_saucelabs_available():
             return 'https://{0}:{1}@ondemand.saucelabs.com:443'.format(username, access_key)
-        else:
-            raise NoAvailableCapacityException("SauceLabs has no available capacity.")
+        raise NoAvailableCapacityException("SauceLabs has no available capacity.")
 
     def is_saucelabs_requested(self, capabilities):
         """
@@ -64,7 +63,8 @@ class SauceLabsHandler(object):
                 error="AMPLIUM_SAUCELABS_CREDENTIALS_BAD",
                 status_code=500
             )
-        elif response.status_code != 200:
+
+        if response.status_code != 200:
             raise AmpliumException(
                 message="Error communicating with SauceLabs",
                 error="AMPLIUM_SAUCELABS_ERROR",

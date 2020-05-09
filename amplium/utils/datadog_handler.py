@@ -17,7 +17,7 @@ from datadog.api.exceptions import (
 logger = logging.getLogger(__name__)
 
 
-class DatadogHandler(object):
+class DatadogHandler:
     """Handler for interacting with Datadog"""
 
     def __init__(self, config):
