@@ -1,5 +1,4 @@
 """ Run of the Amplium application """
-import threading
 
 import connexion
 
