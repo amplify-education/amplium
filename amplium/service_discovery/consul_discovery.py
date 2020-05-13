@@ -41,13 +41,25 @@ class ConsulGridNodeStatus(AbstractDiscovery):
                 logger.debug('Got grid nodes from Consul %s', data)
                 nodes = []
                 for node in data:
-                    nodes.append(self._get_grid_node_data(node))
+                    # Consul will return services even if their underlying nodes are failing checks
+                    # we noticed that the selenium grid nodes sometimes pass service checks despite
+                    # the nodes being unhealthy
+                    # so query consul to confirm that the node is healthy
+                    if await self._is_node_healthy(consul_client, node['Node']):
+                        nodes.append(self._get_grid_node_data(node))
                 logger.info('Setting grid node data %s', nodes)
                 self.nodes = nodes
             except Exception:
                 logger.exception('Error connecting to Consul')
                 # sleep for a few seconds so we don't end up in a tight infinite loop
                 await asyncio.sleep(5)
+
+    async def _is_node_healthy(self, consul_client, node: str):
+        _, node_health_checks = await consul_client.health.node(node)
+        for check in node_health_checks:
+            if check['Status'] != 'passing':
+                return False
+        return True
 
     def get_nodes(self, _: List[str] = None):
         # do nothing because the listen task will automatically restart if there are any errors
