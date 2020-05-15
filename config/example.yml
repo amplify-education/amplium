@@ -3,6 +3,12 @@ zookeeper:
   port: 2181 # Port of zookeeper instance
   selenium_grid_zookeeper_path: '/nerve/services/selenium_grid/services' # Path to selenium grid hub services in zookeeper
 
+# Sample consul config
+#consul:
+#  host: '127.0.0.1' # IP of consul server instance
+#  port: 2181 # Port of consul server
+#  selenium_grid_service_name: 'selenium_grid' # service name for selenium grid
+
 logging:
   version: 1
   disable_existing_loggers: False
