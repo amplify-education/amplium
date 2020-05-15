@@ -1,10 +1,9 @@
 """Class to get grid node data from Consul"""
-import asyncio
 import logging
+
 import threading
-
+from time import sleep
 from typing import Dict, List
-
 import consul.aio
 
 from amplium.models.grid_node_data import GridNodeData
@@ -15,29 +14,26 @@ logger = logging.getLogger(__name__)
 
 class ConsulGridNodeStatus(AbstractDiscovery):
     """Class to get grid node data from Consul"""
+
     def __init__(self, service_name, host, port):
         self.host = host
         self.port = port
         self.service_name = service_name
         self.nodes = []
+        self.consul = consul.Consul(self.host, self.port)
 
     def start_listening(self):
-        # Start a separate thread with a event loop so we can use consul client with asyncio
-        thread = threading.Thread(target=self._run_event_loop)
+        # Start a watch in a separate thread because it loops forever
+        thread = threading.Thread(target=self._watch)
         thread.start()
 
-    def _run_event_loop(self):
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._watch())
-
-    async def _watch(self):
+    def _watch(self):
         """Start polling consul for catalog updates"""
         index = None
-        consul_client = consul.aio.Consul(self.host, self.port)
         logger.info('Starting to watch for changes to consul service %s', self.service_name)
         while True:
             try:
-                [index, data] = await consul_client.catalog.service(self.service_name, index=index)
+                index, data = self.consul.catalog.service(self.service_name, index=index)
                 logger.debug('Got grid nodes from Consul %s', data)
                 nodes = []
                 for node in data:
@@ -45,17 +41,17 @@ class ConsulGridNodeStatus(AbstractDiscovery):
                     # we noticed that the selenium grid nodes sometimes pass service checks despite
                     # the nodes being unhealthy
                     # so query consul to confirm that the node is healthy
-                    if await self._is_node_healthy(consul_client, node['Node']):
+                    if self._is_node_healthy(node['Node']):
                         nodes.append(self._get_grid_node_data(node))
                 logger.info('Setting grid node data %s', nodes)
                 self.nodes = nodes
             except Exception:
                 logger.exception('Error connecting to Consul')
                 # sleep for a few seconds so we don't end up in a tight infinite loop
-                await asyncio.sleep(5)
+                sleep(5)
 
-    async def _is_node_healthy(self, consul_client, node: str):
-        _, node_health_checks = await consul_client.health.node(node)
+    def _is_node_healthy(self, node: str):
+        _, node_health_checks = self.consul.health.node(node)
         for check in node_health_checks:
             if check['Status'] != 'passing':
                 return False
