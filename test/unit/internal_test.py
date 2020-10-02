@@ -21,4 +21,4 @@ class InternalUnitTests(unittest.TestCase):
         """Tests the get status function"""
         result, code = internal.get_status()
         self.assertEqual(result['status'], 'OK')
-        self.assertEqual(code, 503)
+        self.assertEqual(code, 200)
