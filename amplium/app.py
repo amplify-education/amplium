@@ -1,4 +1,6 @@
 """ Run of the Amplium application """
+from ddtrace import patch_all
+patch_all(logging=True)
 
 import connexion
 
@@ -18,12 +20,12 @@ app.add_api(
 
 app.add_error_handler(AmpliumException, handle_amplium_exception)
 app.add_error_handler(Exception, handle_unknown_exception)
+DISCOVERY.start_listening()
 
 # Expose application var for WSGI support
 application = app.app
 
 if __name__ == '__main__':
-    DISCOVERY.start_listening()
     app.run(
         port=8081,
         debug=True
