@@ -1,4 +1,9 @@
 """ Run of the Amplium application """
+import os
+os.environ['DD_SERVICE'] = 'mhcamplium'
+
+# Import ddtrace after setting service name so that it picks up the correct name
+# pylint: disable=wrong-import-position
 from ddtrace import patch_all
 patch_all(logging=True)
 
@@ -20,7 +25,7 @@ app.add_api(
 
 app.add_error_handler(AmpliumException, handle_amplium_exception)
 app.add_error_handler(Exception, handle_unknown_exception)
-DISCOVERY.start_listening()
+app.app.before_first_request(DISCOVERY.start_listening)
 
 # Expose application var for WSGI support
 application = app.app
