@@ -33,7 +33,11 @@ class ConsulGridNodeStatus(AbstractDiscovery):
         logger.info('Starting to watch for changes to consul service %s', self.service_name)
         while True:
             try:
-                index, data = self.consul.catalog.service(self.service_name, index=index)
+                index, data = self.consul.catalog.service(
+                    self.service_name,
+                    index=index,
+                    filter="NodeMeta.is_testing!=1"
+                )
                 logger.debug('Got grid nodes from Consul %s', data)
                 nodes = []
                 for node in data:
