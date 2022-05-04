@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: amplium
+  annotations:
+    github.com/project-slug: amplify-education/amplium
+spec:
+  type: other
+  lifecycle: unknown
