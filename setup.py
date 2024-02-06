@@ -31,8 +31,8 @@ def get_version():
 
 
 def get_requirements():
-    """Reads the installation requirements from requirements.pip"""
-    with open("requirements.pip") as reqfile:
+    """Reads the installation requirements from requirements.txt"""
+    with open("requirements.txt") as reqfile:
         return filter(lambda line: not line.startswith(('#', '-')), reqfile.read().split("\n"))
 
 

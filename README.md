@@ -16,7 +16,7 @@ Quick Start
 ===========
 ```bash
 pip install -e .
-pip install -r requirements.pip
+pip install -r requirements.txt
 AMPLIUM_CONFIG=config/example.yml python amplium/app.py
 ```
 
