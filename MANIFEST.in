@@ -3,3 +3,4 @@ include *.pip
 include *.md
 include *.rst
 prune test
+include *requirements.txt
